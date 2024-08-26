@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Inspeção de Campo</title>
+    <link rel="stylesheet" href="projeto.css">
+</head>
+<body>
+    <header>
+        <h1>Sistema de Inspeção de Campo</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#rft">RFT - Relatório de Obra</a></li>
+            <li><a href="#dro">DRO - Diário de Obras</a></li>
+            <li><a href="#eap">EAP - Estrutura Analítica do Projeto</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="rft">
+            <h2>RFT - Relatório de Obra</h2>
+            <form>
+                <input type="file" accept="image/*" capture="camera">
+                <textarea placeholder="Descrição da obra"></textarea>
+                <button type="submit">Gerar Relatório PDF</button>
+            </form>
+        </section>
+
+        <section id="dro">
+            <h2>DRO - Diário de Obras</h2>
+            <form>
+                <input type="file" accept="image/*" capture="camera">
+                <textarea placeholder="Atividades do dia"></textarea>
+                <button type="button">Copiar do dia anterior</button>
+                <button type="submit">Gerar Relatório PDF</button>
+            </form>
+        </section>
+
+        <section id="eap">
+            <h2>EAP - Estrutura Analítica do Projeto</h2>
+            <p>Upload da planilha Excel:</p>
+            <input type="file" accept=".xlsx,.xls">
+            <button type="button">Visualizar EAP</button>
+        </section>
+
+        <section id="criterios">
+            <h2>Critérios do Sistema</h2>
+            <ul>
+                <li>Mobile (Responsivo para iPhone e Android)</li>
+                <li>Geolocalização ativada</li>
+                <li>Fluxo de Assinatura digital</li>
+                <li>Opção de copiar DRO do dia anterior</li>
+                <li>Relatórios gerados em PDF</li>
+                <li>Ambiente para disponibilização dos relatórios aos clientes</li>
+            </ul>
+        </section>
+
+        <section id="perfis">
+            <h2>Perfis de Usuário</h2>
+            <ul>
+                <li>Gestor</li>
+                <li>Fiscal</li>
+                <li>Visualizador (Cliente e outros do Time)</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Sistema de Inspeção de Campo</p>
+    </footer>
+
+
+    <section id="eap">
+        <h2>EAP - Estrutura Analítica do Projeto</h2>
+        <div id="drop-area">
+            <p>Arraste e solte o arquivo Excel aqui ou</p>
+            <input type="file" id="eapFile" accept=".xlsx,.xls" hidden>
+            <button type="button" id="fileSelect">Selecione o arquivo</button>
+        </div>
+        <button type="button" id="viewEAPBtn" disabled>Visualizar EAP</button>
+        <div id="eapContent"></div>
+    </section>
+
+
+    <script>
+     
+     // main.js
+
+// Função para obter a geolocalização
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+    } else {
+        alert("Geolocalização não é suportada por este navegador.");
+    }
+}
+
+function showPosition(position) {
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+    alert(`Latitude: ${lat}\nLongitude: ${lon}`);
+    // Aqui você poderia enviar essas coordenadas para o servidor
+}
+
+function showError(error) {
+    switch(error.code) {
+        case error.PERMISSION_DENIED:
+            alert("Usuário negou a solicitação de Geolocalização.");
+            break;
+        case error.POSITION_UNAVAILABLE:
+            alert("Informação de localização indisponível.");
+            break;
+        case error.TIMEOUT:
+            alert("A requisição para obter a localização do usuário expirou.");
+            break;
+        case error.UNKNOWN_ERROR:
+            alert("Ocorreu um erro desconhecido.");
+            break;
+    }
+}
+
+// Função para copiar o DRO do dia anterior
+function copyPreviousDRO() {
+    // Simula a obtenção do DRO anterior
+    const previousDRO = "Atividades do dia anterior...";
+    document.querySelector('#dro textarea').value = previousDRO;
+}
+
+// Função para gerar PDF (simulada)
+function generatePDF(type) {
+    alert(`Gerando PDF para ${type}...`);
+    // Aqui você integraria uma biblioteca de geração de PDF
+}
+
+// Função para visualizar EAP (simulada)
+function viewEAP() {
+    const fileInput = document.querySelector('#eap input[type="file"]');
+    if (fileInput.files.length > 0) {
+        alert("Visualizando EAP...");
+        // Aqui você implementaria a lógica para ler e exibir o arquivo Excel
+    } else {
+        alert("Por favor, selecione um arquivo Excel primeiro.");
+    }
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Geolocalização
+    getLocation();
+
+    // Copiar DRO anterior
+    const copyDROButton = document.querySelector('#dro button[type="button"]');
+    copyDROButton.addEventListener('click', copyPreviousDRO);
+
+    // Gerar PDF para RFT
+    const rftForm = document.querySelector('#rft form');
+    rftForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        generatePDF('RFT');
+    });
+
+    // Gerar PDF para DRO
+    const droForm = document.querySelector('#dro form');
+    droForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        generatePDF('DRO');
+    });
+
+    // Visualizar EAP
+    const viewEAPButton = document.querySelector('#eap button');
+    viewEAPButton.addEventListener('click', viewEAP);
+});
+
+
+function viewEAP() {
+    const fileInput = document.getElementById('eapFile');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert("Por favor, selecione um arquivo Excel primeiro.");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, {type: 'array'});
+
+        // Assume que queremos a primeira planilha
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+
+        // Converte a planilha para HTML
+        const html = XLSX.utils.sheet_to_html(worksheet);
+
+        // Exibe o conteúdo
+        document.getElementById('eapContent').innerHTML = html;
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const dropArea = document.getElementById('drop-area');
+    const fileInput = document.getElementById('eapFile');
+    const fileSelect = document.getElementById('fileSelect');
+    const viewEAPBtn = document.getElementById('viewEAPBtn');
+
+    // Prevenir comportamento padrão de arrastar e soltar
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    // Destaque visual quando arrastar sobre a área
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+        dropArea.classList.add('highlight');
+    }
+
+    function unhighlight() {
+        dropArea.classList.remove('highlight');
+    }
+
+    // Lidar com o arquivo solto
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles(files);
+    }
+
+    function handleFiles(files) {
+        if (files.length > 0) {
+            fileInput.files = files;
+            updateFileInfo();
+        }
+    }
+
+    // Lidar com seleção de arquivo via botão
+    fileSelect.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', updateFileInfo);
+
+    function updateFileInfo() {
+        const fileName = fileInput.files[0] ? fileInput.files[0].name : '';
+        dropArea.querySelector('p').textContent = fileName || 'Arraste e solte o arquivo Excel aqui ou';
+        viewEAPBtn.disabled = !fileName;
+        viewEAPBtn.classList.toggle('active', !!fileName);
+    }
+
+    // Visualizar EAP
+    viewEAPBtn.addEventListener('click', viewEAP);
+
+    function viewEAP() {
+        const file = fileInput.files[0];
+        if (!file) {
+            alert("Por favor, selecione um arquivo Excel primeiro.");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+
+            const html = XLSX.utils.sheet_to_html(worksheet);
+
+            document.getElementById('eapContent').innerHTML = html;
+        };
+        reader.readAsArrayBuffer(file);
+    }
+});
+    </script>
+</body>
+</html>
